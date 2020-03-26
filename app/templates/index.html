@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>EPyTodo</title>
+        <meta charset="utf-8" />
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+        <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    </head>
+    <body>
+        <header>
+            <div id="header">
+                <div>
+                    <h1 class="title">EPyTodo - To-do list</h1>
+                </div>
+                <div>
+                    {% if username == None %}
+                    <button id="login" class="button" onclick="show_page('login_page')">Log in</button>
+                    <button id="signup" class="button" onclick="show_page('signup_page')">Sign up</button>
+                    {% else %}
+                    <button id="logout" class="button" onclick="signout_user()">Sign out</button>
+                    {% endif %}
+                </div>
+            </div>
+            <hr />
+        </header>
+        <p id="description">
+            {% if username == None %}
+            Welcome to our Epitech's To-do list !<br />
+            Here you can add and handle your task as you want.
+            {% else %}
+            Welcome {{ username }} !<br />
+            Here are your tasks
+            {% endif %}
+        </p>
+        <div id="content"></div>
+    </body>
+</html>

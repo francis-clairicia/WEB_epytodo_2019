@@ -1,0 +1,77 @@
+body
+{
+    cursor: default;
+}
+
+h1.title
+{
+    color: rgb(0, 106, 179);
+    font-size: 5em;
+    text-shadow: 2px 2px 4px gray;
+}
+
+.button
+{
+    color: white;
+    background-color: rgb(0, 106, 179);
+    font-size: 3em;
+    border: 3px rgb(0, 106, 179) outset;
+    border-radius: 10px;
+    outline: none;
+    cursor: pointer;
+    padding: 5px 15px;
+    transition-duration: 200ms;
+    box-shadow: 0px 4px 0px rgb(0, 73, 122);
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+.button:hover
+{
+    background-color: white;
+    color: rgb(0, 106, 179);
+}
+
+.button:active
+{
+    box-shadow: 0px 0px;
+    transform: translateY(4px);
+}
+
+#header
+{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+#description
+{
+    font-size: 3em;
+    text-align: center;
+}
+
+.form
+{
+    text-align: center;
+}
+
+.form fieldset
+{
+    display: inline-block;
+    border: 3px black solid;
+}
+
+.field
+{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+#submit, .field label, .field input, .form fieldset legend
+{
+    font-size: 1.5em;
+}
