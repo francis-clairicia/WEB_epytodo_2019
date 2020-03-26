@@ -23,15 +23,29 @@
             </div>
             <hr />
         </header>
-        <p id="description">
-            {% if username == None %}
+        {% if username == None %}
+        <p class="section_title">
             Welcome to our Epitech's To-do list !<br />
             Here you can add and handle your task as you want.
-            {% else %}
-            Welcome {{ username }} !<br />
-            Here are your tasks
-            {% endif %}
         </p>
         <div id="content"></div>
+        {% else %}
+        <div id="content">
+            <div id="task_section">
+                <p id="welcome_user" class="section_title">
+                    Welcome {{ username }} !<br />
+                    Here are your tasks
+                </p>
+            </div>
+            <div id="options_section">
+                <p id="option_title" class="section_title">
+                    Choose an option
+                </p>
+                <button class="button option_button">Add task</button>
+                <button class="button option_button">Remove task</button>
+                <button class="button option_button">Show my profile</button>
+            </div>
+        </div>
+        {% endif %}
     </body>
 </html>
