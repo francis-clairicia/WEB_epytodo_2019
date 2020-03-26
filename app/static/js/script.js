@@ -1,27 +1,29 @@
-function show_page(page) {
-    var content = document.getElementById("content");
-    var xhr = new XMLHttpRequest();
+const show_page = (page, id_content) => {
+    let content = document.getElementById(id_content);
 
-    xhr.onreadystatechange = function() {
-        if (this.readyState === 4) {
-            if (this.status === 200) {
-                content.innerHTML = this.responseText;
-            }
-            if (this.status === 404) {
-                content.innerHTML = "Page not found.";
-            }
+    fetch(page, {method: "GET"})
+    .then(function(response) {
+        if (response.ok) {
+            return response.text();
+        } else {
+            alert("Error " + response.status + ": " + response.statusText);
+            return null;
         }
-    };
-    xhr.open("GET", page);
-    xhr.send();
-}
+    })
+    .then(function(text) {
+        if (text != null) {
+            content.innerHTML = text;
+        }
+    })
+    .catch(error => console.error("Error: " + error.message));
+};
 
-function register_user(form) {
-    var username = form.username.value;
-    var passwd = form.password.value;
-    var passwd_confirm = form.confirm_password.value;
-    var json = {"username": username, "password": passwd};
-    var xhr = new XMLHttpRequest();
+const register_user = (form) => {
+    const username = form.username.value;
+    const passwd = form.password.value;
+    const passwd_confirm = form.confirm_password.value;
+    const json = JSON.stringify({"username": username, "password": passwd});
+    const my_headers = new Headers({"Content-Type": "application/json;charset=utf-8"});
 
     if (passwd.length < 8) {
         alert("Your password must have at least 8 characters");
@@ -31,57 +33,149 @@ function register_user(form) {
         alert("The two password doesn't match !");
         return;
     }
-    xhr.onreadystatechange = function() {
-        if (this.readyState === 4 && this.status === 200) {
-            var json = JSON.parse(this.responseText);
+    fetch("/register", {method: "POST", headers: my_headers, body: json})
+    .then(function(response) {
+        if (response.ok) {
+            return response.json();
+        } else {
+            alert("Error " + response.status + ": " + response.statusText);
+            return null;
+        }
+    })
+    .then(function(json) {
+        if (json != null) {
             if (json.hasOwnProperty("result")) {
                 alert(json["result"]);
-                show_page("login_page");
+                show_page("/login_page", "content");
             } else {
                 alert("Error: " + json["error"]);
             }
         }
-    };
-    xhr.open("POST", "/register");
-    xhr.setRequestHeader("Content-Type", "application/json");
-    xhr.send(JSON.stringify(json));
-}
+    })
+    .catch(error => console.error("Error: " + error.message));
+};
 
-function signin_user(form) {
-    var username = form.username.value;
-    var passwd = form.password.value;
-    var json = {"username": username, "password": passwd};
-    var xhr = new XMLHttpRequest();
+const signin_user = (form) => {
+    const username = form.username.value;
+    const passwd = form.password.value;
+    const json = JSON.stringify({"username": username, "password": passwd});
+    const my_headers = new Headers({"Content-Type": "application/json;charset=utf-8"});
 
-    xhr.onreadystatechange = function() {
-        if (this.readyState === 4 && this.status === 200) {
-            var json = JSON.parse(this.responseText);
+    fetch("/signin", {method: "POST", headers: my_headers, body: json})
+    .then(function(response) {
+        if (response.ok) {
+            return response.json();
+        } else {
+            alert("Error " + response.status + ": " + response.statusText);
+            return null;
+        }
+    })
+    .then(function(json) {
+        if (json != null) {
             if (json.hasOwnProperty("result")) {
                 location.reload();
             } else {
                 alert("Error: " + json["error"]);
             }
         }
-    };
-    xhr.open("POST", "/signin");
-    xhr.setRequestHeader("Content-Type", "application/json");
-    xhr.send(JSON.stringify(json));
-}
+    })
+    .catch(error => console.error("Error: " + error.message));
+};
 
-function signout_user() {
-    var xhr = new XMLHttpRequest();
+const signout_user = () => {
+    fetch("/signout", {method: "POST"})
+    .then(function(response) {
+        if (response.ok) {
+            return response.json();
+        } else {
+            alert("Error " + response.status + ": " + response.statusText);
+            return null;
+        }
+    })
+    .then(function(json) {
+        if (json != null) {
+            location.reload();
+        }
+    })
+    .catch(error => console.error("Error: " + error.message));
+};
 
-    xhr.onreadystatechange = function() {
-        if (this.readyState === 4 && this.status === 200) {
-            var json = JSON.parse(this.responseText);
+const add_task = (form) => {
+    const title = form.title.value;
+    const json = JSON.stringify({"title": title});
+    const my_headers = new Headers({"Content-Type": "application/json;charset=utf-8"});
+
+    fetch("/user/task/add", {method: "POST", headers: my_headers, body: json})
+    .then(function(response) {
+        if (response.ok) {
+            return response.json();
+        } else {
+            alert("Error " + response.status + ": " + response.statusText);
+            return null;
+        }
+    })
+    .then(function(json) {
+        if (json != null) {
             if (json.hasOwnProperty("result")) {
+                alert(json["result"]);
                 location.reload();
             } else {
                 alert("Error: " + json["error"]);
             }
         }
-    };
-    xhr.open("POST", "/signout");
-    xhr.setRequestHeader("Content-Type", "application/json");
-    xhr.send();
-}
+    })
+    .catch(error => console.error("Error: " + error.message));
+};
+
+const get_all_tasks = () => {
+    let task_table = document.getElementById("task_table");
+
+    fetch("/user/task", {method: "GET"})
+    .then(function(response) {
+        if (response.ok) {
+            return response.json();
+        } else {
+            alert("Error " + response.status + ": " + response.statusText);
+            return null;
+        }
+    })
+    .then(function(json) {
+        if (json != null) {
+            if (json.hasOwnProperty("result")) {
+                task_table.innerHTML = create_task_table_from_json(json);
+            } else {
+                alert("Error: " + json["error"]);
+            }
+        }
+    })
+    .catch(error => console.error("Error: " + error.message));
+};
+
+const create_task_table_from_json = (json) => {
+    const tasks = json["result"]["tasks"];
+    let output = "";
+
+    if (tasks.length == 0) {
+        return "You don't have tasks yet";
+    }
+    output += "<table class='table'>";
+    output += "<thead>";
+    output += "<tr>";
+    output += "<th>ID</th>";
+    output += "<th>Title</th>";
+    output += "</tr>";
+    output += "</thead>";
+    output += "<tbody>";
+    for (const task of tasks) {
+        output += "<tr>";
+        for (const id in task) {
+            const infos = task[id];
+            output += "<td>" + id + "</td>";
+            output += "<td>" + infos["title"] + "</td>";
+        }
+        output += "</tr>";
+    }
+    output += "</tbody>";
+    output += "</table>";
+    return output;
+};

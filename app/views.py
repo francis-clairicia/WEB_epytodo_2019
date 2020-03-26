@@ -20,3 +20,7 @@ def register_form():
 @app.route("/login_page", methods=["GET"])
 def login_form():
     return render_template("login_page.html")
+
+@app.route("/add_task_page", methods=["GET"])
+def add_task_page():
+    return render_template("add_task.html")

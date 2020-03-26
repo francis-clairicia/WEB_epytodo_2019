@@ -14,8 +14,8 @@
                 </div>
                 <div>
                     {% if username == None %}
-                    <button id="login" class="button" onclick="show_page('login_page')">Log in</button>
-                    <button id="signup" class="button" onclick="show_page('signup_page')">Sign up</button>
+                    <button id="login" class="button" onclick="show_page('/login_page', 'content')">Log in</button>
+                    <button id="signup" class="button" onclick="show_page('/signup_page', 'content')">Sign up</button>
                     {% else %}
                     <button id="logout" class="button" onclick="signout_user()">Sign out</button>
                     {% endif %}
@@ -30,20 +30,27 @@
         </p>
         <div id="content"></div>
         {% else %}
-        <div id="content">
-            <div id="task_section">
-                <p id="welcome_user" class="section_title">
-                    Welcome {{ username }} !<br />
-                    Here are your tasks
-                </p>
+        <div id="user_section">
+            <div id="left_section">
+                <div id="task_section">
+                    <p id="welcome_user" class="section_title">
+                        Welcome {{ username }} !<br />
+                        Here are your tasks
+                    </p>
+                    <div id="task_table"></div>
+                    <script>get_all_tasks()</script>
+                </div>
             </div>
-            <div id="options_section">
-                <p id="option_title" class="section_title">
-                    Choose an option
-                </p>
-                <button class="button option_button">Add task</button>
-                <button class="button option_button">Remove task</button>
-                <button class="button option_button">Show my profile</button>
+            <div id="right_section">
+                <div id="options_section">
+                    <p id="option_title" class="section_title">
+                        Choose an option
+                    </p>
+                    <button class="button option_button" onclick="show_page('/add_task_page', 'result_section')">Add task</button>
+                    <button class="button option_button">Remove task</button>
+                    <button class="button option_button">Show my profile</button>
+                </div>
+                <div id="result_section"></div>
             </div>
         </div>
         {% endif %}

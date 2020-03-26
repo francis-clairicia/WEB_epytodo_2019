@@ -24,6 +24,19 @@ def user():
     api = EPyTodoAPI()
     return api.get_user_infos()
 
-# @app.route("/user/task/<int:id>", methods=["GET", "POST"])
-# def task():
-#     pass
+@app.route("/user/task", methods=["GET"])
+def tasks():
+    api = EPyTodoAPI()
+    return api.get_all_user_tasks()
+
+@app.route("/user/task/<int:id>", methods=["GET", "POST"])
+def get_task(id: int):
+    api = EPyTodoAPI()
+    if request.method == "POST":
+        return None
+    return api.get_task_infos(id)
+
+@app.route("/user/task/add", methods=["POST"])
+def add_task():
+    api = EPyTodoAPI()
+    return api.add_task(request.json)

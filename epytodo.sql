@@ -11,8 +11,8 @@ CREATE TABLE `user` (
 CREATE TABLE `task` (
   `task_id` int(32) PRIMARY KEY NOT NULL AUTO_INCREMENT,
   `title` varchar(255) NOT NULL,
-  `begin` datetime NOT NULL DEFAULT current_timestamp(),
-  `end` datetime DEFAULT NULL,
+  `begin` timestamp NOT NULL DEFAULT current_timestamp(),
+  `end` timestamp NULL DEFAULT NULL,
   `status` varchar(255) NOT NULL DEFAULT 'not started'
 ) DEFAULT CHARSET=utf8;
 
