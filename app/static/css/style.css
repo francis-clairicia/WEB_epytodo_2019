@@ -39,6 +39,15 @@ h1.title
     transform: translateY(4px);
 }
 
+.button:disabled
+{
+    cursor: not-allowed;
+    background-color: gray;
+    color: black;
+    box-shadow: 0px 4px 0px black;
+    border-color: gray;
+}
+
 /* Main page */
 
 #header
@@ -116,9 +125,14 @@ h1.title
     text-align: center;
 }
 
+.table tbody tr:hover
+{
+    text-decoration: underline;
+}
+
 .table tbody tr:active
 {
-    background-color: rgb(100, 100, 100);
+    background-color: lightgray;
 }
 
 .table, .table thead tr th, .table tbody tr td

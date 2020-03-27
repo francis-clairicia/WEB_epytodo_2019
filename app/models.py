@@ -113,7 +113,6 @@ class EPyTodoAPI():
     def get_task_infos(self, task_id: int):
         if "username" not in session:
             return jsonify(error="you must be logged in")
-        task = dict()
         self.cursor.execute(f"SELECT title, begin, end, status FROM task WHERE task_id={task_id}")
         database_result = self.cursor.fetchall()
         if len(database_result) == 0:
@@ -126,3 +125,15 @@ class EPyTodoAPI():
             "status": status
         }
         return jsonify(result=task)
+
+    @connect_to_database
+    def delete_task(self, task_id: int):
+        if "username" not in session:
+            return jsonify(error="you must be logged in")
+        self.cursor.execute(f"SELECT * FROM task WHERE task_id={task_id}")
+        database_result = self.cursor.fetchall()
+        if len(database_result) == 0:
+            return jsonify(error="task id does not exist")
+        self.cursor.execute(f"DELETE FROM user_has_task WHERE fk_task_id={task_id}")
+        self.cursor.execute(f"DELETE FROM task WHERE task_id={task_id}")
+        return jsonify(result="task deleted")

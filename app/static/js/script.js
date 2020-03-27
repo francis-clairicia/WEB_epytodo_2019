@@ -156,26 +156,59 @@ const create_task_table_from_json = (json) => {
     let output = "";
 
     if (tasks.length == 0) {
-        return "You don't have tasks yet";
+        return "<p class='section_title'>You don't have tasks yet</p>";
     }
     output += "<table class='table'>";
     output += "<thead>";
     output += "<tr>";
-    output += "<th>ID</th>";
     output += "<th>Title</th>";
     output += "</tr>";
     output += "</thead>";
     output += "<tbody>";
     for (const task of tasks) {
-        output += "<tr>";
         for (const id in task) {
+            output += "<tr task_id='" + id + "' onclick='select_task(this);event.cancelBubble=true;'>";
             const infos = task[id];
-            output += "<td>" + id + "</td>";
             output += "<td>" + infos["title"] + "</td>";
+            output += "</tr>";
         }
-        output += "</tr>";
     }
     output += "</tbody>";
     output += "</table>";
     return output;
+};
+
+const select_task = (row) => {
+    let id = row.getAttribute("task_id");
+    let result = document.getElementById("result_section");
+    let remove_button = document.getElementById("remove_task");
+
+    remove_button.disabled = false;
+    remove_button.setAttribute("task_id", id);
+    result.innerHTML = id;
+};
+
+const delete_task = (button) => {
+    let task_id = button.getAttribute("task_id");
+
+    fetch("/user/task/del/" + task_id, {method: "POST"})
+    .then(function(response) {
+        if (response.ok) {
+            return response.json();
+        } else {
+            alert("Error " + response.status + ": " + response.statusText);
+            return null;
+        }
+    })
+    .then(function(json) {
+        if (json != null) {
+            if (json.hasOwnProperty("result")) {
+                alert(json["result"]);
+                location.reload();
+            } else {
+                alert("Error: " + json["error"]);
+            }
+        }
+    })
+    .catch(error => console.error("Error: " + error.message));
 };
