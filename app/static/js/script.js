@@ -158,13 +158,10 @@ const create_task_table_from_json = (json) => {
     if (tasks.length == 0) {
         return "<p class='section_title'>You don't have tasks yet</p>";
     }
-    output += "<table class='table'>";
-    output += "<thead>";
+    output += "<table class='table task_table'>";
     output += "<tr>";
     output += "<th>Title</th>";
     output += "</tr>";
-    output += "</thead>";
-    output += "<tbody>";
     for (const task of tasks) {
         for (const id in task) {
             output += "<tr task_id='" + id + "' onclick='select_task(this);event.cancelBubble=true;'>";
@@ -173,7 +170,6 @@ const create_task_table_from_json = (json) => {
             output += "</tr>";
         }
     }
-    output += "</tbody>";
     output += "</table>";
     return output;
 };
@@ -185,7 +181,42 @@ const select_task = (row) => {
 
     remove_button.disabled = false;
     remove_button.setAttribute("task_id", id);
-    result.innerHTML = id;
+    fetch("/user/task/" + id, {method: "GET"})
+    .then(function(response) {
+        if (response.ok) {
+            return response.json();
+        } else {
+            alert("Error " + response.status + ": " + response.statusText);
+            return null;
+        }
+    })
+    .then(function(json) {
+        if (json != null) {
+            if (json.hasOwnProperty("result")) {
+                result.innerHTML = create_infos_table_from_json(json);
+            } else {
+                alert("Error: " + json["error"]);
+            }
+        }
+    })
+    .catch(error => console.error("Error: " + error.message));
+};
+
+const create_infos_table_from_json = (json) => {
+    const task = json["result"];
+    let output = "";
+
+    output += "<table class='table'>";
+    output += "<caption>Task selected</caption>";
+    for (const info of ["Title", "Begin", "End", "Status"]) {
+        output += "<tr>";
+        output += "<th>" + info + "</th>";
+        output += "<td>" + task[info.toLowerCase()] + "</td>";
+        output += "<td><button class='button' style='font-size:1em'>Modify</button></td>";
+        output += "</tr>";
+    }
+    output += "</table>";
+    return output;
 };
 
 const delete_task = (button) => {

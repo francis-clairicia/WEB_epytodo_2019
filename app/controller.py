@@ -41,7 +41,7 @@ def add_task():
     api = EPyTodoAPI()
     return api.add_task(request.json)
 
-@app.route("/user/task/del/<int:id>", methods=["GET", "POST"])
+@app.route("/user/task/del/<int:id>", methods=["POST"])
 def delete_task(id: int):
     api = EPyTodoAPI()
     return api.delete_task(id)

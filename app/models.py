@@ -103,7 +103,7 @@ class EPyTodoAPI():
             task[task_id] = {
                 "title": title,
                 "begin": begin.strftime("%Y-%m-%d %H:%M:%S"),
-                "end": end if end is None else end.strftime("%Y-%m-%d, %H:%M:%S"),
+                "end": end if end is None else end.strftime("%Y-%m-%d %H:%M:%S"),
                 "status": status
             }
             tasks.append(task)
@@ -121,7 +121,7 @@ class EPyTodoAPI():
         task = {
             "title": title,
             "begin": begin.strftime("%Y-%m-%d %H:%M:%S"),
-            "end": end if end is None else end.strftime("%Y-%m-%d, %H:%M:%S"),
+            "end": end if end is None else end.strftime("%Y-%m-%d %H:%M:%S"),
             "status": status
         }
         return jsonify(result=task)

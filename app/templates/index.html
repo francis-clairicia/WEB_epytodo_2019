@@ -46,11 +46,10 @@
                     <p id="option_title" class="section_title">
                         Choose an option
                     </p>
-                    <button id="add_task" class="button option_button" onclick="show_page('/add_task_page', 'result_section')">Add task</button>
+                    <button id="add_task" class="button option_button" onclick="show_page('/add_task_page', 'result_section');document.getElementById('remove_task').disabled = true;">Add task</button>
                     <button id="remove_task" class="button option_button" onclick="delete_task(this)" disabled>Remove task</button>
                     <button id="show_profile" class="button option_button">Show my profile</button>
                 </div>
-                <script>document.body.onclick = () => {document.getElementById('remove_task').disabled = true;}</script>
                 <div id="result_section"></div>
             </div>
         </div>
