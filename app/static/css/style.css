@@ -157,3 +157,10 @@ h1.title
 {
     margin-bottom: 30px;
 }
+
+#result_section
+{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}

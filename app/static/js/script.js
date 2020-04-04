@@ -30,7 +30,7 @@ const register_user = (form) => {
         return;
     }
     if (passwd.localeCompare(passwd_confirm) != 0) {
-        alert("The two password doesn't match !");
+        alert("The two passwords don't match !");
         return;
     }
     fetch("/register", {method: "POST", headers: my_headers, body: json})
@@ -194,6 +194,7 @@ const select_task = (row) => {
         if (json != null) {
             if (json.hasOwnProperty("result")) {
                 result.innerHTML = create_infos_table_from_json(json);
+                result.innerHTML += "<button class='button' onclick='show_task_modification()'>Modify</button>";
             } else {
                 alert("Error: " + json["error"]);
             }
@@ -206,15 +207,28 @@ const create_infos_table_from_json = (json) => {
     const task = json["result"];
     let output = "";
 
-    output += "<table class='table'>";
+    output += "<table class='table' id='task_infos'>";
     output += "<caption>Task selected</caption>";
-    for (const info of ["Title", "Begin", "End", "Status"]) {
-        output += "<tr>";
-        output += "<th>" + info + "</th>";
-        output += "<td>" + task[info.toLowerCase()] + "</td>";
-        output += "<td><button class='button' style='font-size:1em'>Modify</button></td>";
-        output += "</tr>";
+    output += "<tr>";
+    output += "<th>Title</th>";
+    output += "<td>" + task["title"] + "</td>";
+    output += "</tr>";
+    output += "<tr>";
+    output += "<th>Begin</th>";
+    output += "<td>" + task["begin"] + "</td>";
+    output += "</tr>";
+    output += "<tr>";
+    output += "<th>End</th>";
+    if (task["end"] == null) {
+        output += "<td>" + task["begin"] + "</td>";
+    } else {
+        output += "<td>" + task["end"] + "</td>";
     }
+    output += "</tr>";
+    output += "<tr>";
+    output += "<th>Status</th>";
+    output += "<td>" + task["status"].charAt(0).toUpperCase() + task["status"].slice(1) + "</td>";
+    output += "</tr>";
     output += "</table>";
     return output;
 };
@@ -222,6 +236,9 @@ const create_infos_table_from_json = (json) => {
 const delete_task = (button) => {
     let task_id = button.getAttribute("task_id");
 
+    if (!confirm("Do you really want to remove this task ?")) {
+        return;
+    }
     fetch("/user/task/del/" + task_id, {method: "POST"})
     .then(function(response) {
         if (response.ok) {
@@ -243,3 +260,13 @@ const delete_task = (button) => {
     })
     .catch(error => console.error("Error: " + error.message));
 };
+
+const show_task_modification = () => {
+    const task_table = document.getElementById("task_table");
+
+    for (const i = 0; i < task_table.rows.length; i++) {
+        const row = task_table.rows[i]
+        const content = row.cells[1].innerHTML;
+        row.cells[1].innerHTML = "<input type='text' value='" + content + "' />"
+    }
+}
