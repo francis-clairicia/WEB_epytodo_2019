@@ -30,10 +30,10 @@ def tasks():
     return api.get_all_user_tasks()
 
 @app.route("/user/task/<int:id>", methods=["GET", "POST"])
-def get_task(id: int):
+def get_or_update_task(id: int):
     api = EPyTodoAPI()
     if request.method == "POST":
-        return None
+        return api.update_task(id, request.json)
     return api.get_task_infos(id)
 
 @app.route("/user/task/add", methods=["POST"])

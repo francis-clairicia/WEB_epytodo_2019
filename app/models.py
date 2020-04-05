@@ -137,3 +137,18 @@ class EPyTodoAPI():
         self.cursor.execute(f"DELETE FROM user_has_task WHERE fk_task_id={task_id}")
         self.cursor.execute(f"DELETE FROM task WHERE task_id={task_id}")
         return jsonify(result="task deleted")
+
+    @connect_to_database
+    def update_task(self, task_id: int, new_values: dict):
+        if "username" not in session:
+            return jsonify(error="you must be logged in")
+        self.cursor.execute(f"SELECT * FROM task WHERE task_id={task_id}")
+        database_result = self.cursor.fetchall()
+        if len(database_result) == 0:
+            return jsonify(error="task id does not exist")
+        keywords = {key: f"'{value}'" for key, value in new_values.items()}
+        if keywords["begin"] == keywords["end"]:
+            keywords["end"] = "null"
+        keywords["task_id"] = task_id
+        self.cursor.execute("UPDATE task SET title={title}, begin={begin}, end={end}, status={status} WHERE task_id={task_id}".format(**keywords))
+        return jsonify(result="update done")

@@ -164,7 +164,7 @@ const create_task_table_from_json = (json) => {
     output += "</tr>";
     for (const task of tasks) {
         for (const id in task) {
-            output += "<tr task_id='" + id + "' onclick='select_task(this);event.cancelBubble=true;'>";
+            output += "<tr onclick='select_task(" + id + ");event.cancelBubble=true;'>";
             const infos = task[id];
             output += "<td>" + infos["title"] + "</td>";
             output += "</tr>";
@@ -174,9 +174,9 @@ const create_task_table_from_json = (json) => {
     return output;
 };
 
-const select_task = (row) => {
-    let id = row.getAttribute("task_id");
+const select_task = (id) => {
     let result = document.getElementById("result_section");
+    let modify = document.getElementById("modify_button_section");
     let remove_button = document.getElementById("remove_task");
 
     remove_button.disabled = false;
@@ -193,8 +193,8 @@ const select_task = (row) => {
     .then(function(json) {
         if (json != null) {
             if (json.hasOwnProperty("result")) {
-                result.innerHTML = create_infos_table_from_json(json);
-                result.innerHTML += "<button class='button' onclick='show_task_modification()'>Modify</button>";
+                result.innerHTML = create_infos_table_from_json(json, id);
+                modify.innerHTML = "<button class='button' onclick='show_task_modification()'>Modify</button>";
             } else {
                 alert("Error: " + json["error"]);
             }
@@ -203,26 +203,26 @@ const select_task = (row) => {
     .catch(error => console.error("Error: " + error.message));
 };
 
-const create_infos_table_from_json = (json) => {
+const create_infos_table_from_json = (json, task_id) => {
     const task = json["result"];
     let output = "";
 
-    output += "<table class='table' id='task_infos'>";
+    output += "<table class='table' id='task_infos' task_id='" + task_id + "'>";
     output += "<caption>Task selected</caption>";
     output += "<tr>";
     output += "<th>Title</th>";
-    output += "<td>" + task["title"] + "</td>";
+    output += "<td input_type='text'>" + task["title"] + "</td>";
     output += "</tr>";
     output += "<tr>";
     output += "<th>Begin</th>";
-    output += "<td>" + task["begin"] + "</td>";
+    output += "<td input_type='datetime-local'>" + task["begin"] + "</td>";
     output += "</tr>";
     output += "<tr>";
     output += "<th>End</th>";
     if (task["end"] == null) {
-        output += "<td>" + task["begin"] + "</td>";
+        output += "<td input_type='datetime-local'>" + task["begin"] + "</td>";
     } else {
-        output += "<td>" + task["end"] + "</td>";
+        output += "<td input_type='datetime-local'>" + task["end"] + "</td>";
     }
     output += "</tr>";
     output += "<tr>";
@@ -234,7 +234,7 @@ const create_infos_table_from_json = (json) => {
 };
 
 const delete_task = (button) => {
-    let task_id = button.getAttribute("task_id");
+    const task_id = button.getAttribute("task_id");
 
     if (!confirm("Do you really want to remove this task ?")) {
         return;
@@ -262,11 +262,68 @@ const delete_task = (button) => {
 };
 
 const show_task_modification = () => {
-    const task_table = document.getElementById("task_table");
+    const task_table = document.getElementById("task_infos");
+    const task_id = task_table.getAttribute("task_id");
+    let modify = document.getElementById("modify_button_section");
 
-    for (const i = 0; i < task_table.rows.length; i++) {
-        const row = task_table.rows[i]
-        const content = row.cells[1].innerHTML;
-        row.cells[1].innerHTML = "<input type='text' value='" + content + "' />"
+    for (const row of task_table.rows) {
+        const name = row.cells[0].innerHTML.toLowerCase();
+        let cell = row.cells[1];
+        let content = cell.innerHTML;
+        const type = cell.getAttribute("input_type");
+        if (name.localeCompare("status") != 0) {
+            if (type == "datetime-local") {
+                content = content.replace(" ", "T");
+            }
+            cell.innerHTML = "<input type='" + type + "' id='task_" + name + "' value='" + content + "' style='font-size:1em;' />";
+        } else {
+            let output = "<select style='font-size:1em;' id='task_" + name + "'>";
+            for (const option of ["Not started", "In progress", "Done"]) {
+                output += "<option " + ((option.localeCompare(content) == 0) ? "selected" : "") + ">";
+                output += option;
+                output += "</option>";
+            }
+            cell.innerHTML = output + "</select>";
+        }
     }
+    modify.innerHTML = "<button class='button validation' onclick='update_task()'>Validation</button>";
+    modify.innerHTML += "<button class='button cancel' onclick='select_task(" + task_id + ")'>Cancel</button>";
 }
+
+const update_task = () => {
+    const task_table = document.getElementById("task_infos");
+    const task_id = task_table.getAttribute("task_id");
+    const json = {
+        "title": document.getElementById("task_title").value,
+        "begin": document.getElementById("task_begin").value.replace("T", " "),
+        "end": document.getElementById("task_end").value.replace("T", " "),
+        "status": document.getElementById("task_status").options[document.getElementById("task_status").selectedIndex].text.toLowerCase(),
+    };
+    const my_headers = new Headers({"Content-Type": "application/json;charset=utf-8"});
+
+    if (json.title.length == 0 || json.begin.length == 0 || json.end.length == 0) {
+        alert("Error: Fields not set correctly");
+        return;
+    }
+    fetch("/user/task/" + task_id, {method: "POST", headers: my_headers, body: JSON.stringify(json)})
+    .then(function(response) {
+        if (response.ok) {
+            return response.json();
+        } else {
+            alert("Error " + response.status + ": " + response.statusText);
+            return null;
+        }
+    })
+    .then(function(json) {
+        if (json != null) {
+            if (json.hasOwnProperty("result")) {
+                alert(json["result"]);
+                get_all_tasks();
+                select_task(task_id);
+            } else {
+                alert("Error: " + json["error"]);
+            }
+        }
+    })
+    .catch(error => console.error("Error: " + error.message));
+};
