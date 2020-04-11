@@ -46,16 +46,13 @@ class EPyTodoAPI():
     @connect_to_database
     def login_user(self, user: dict):
         if "username" in session:
-            return jsonify(error="already login to an account")
-        username = user["username"]
-        password = user["password"]
+            return jsonify(error="already logged to an account")
         user["password"] = encrypt_string(user["password"])
         self.cursor.execute("SELECT * FROM user WHERE username='{username}' AND password='{password}'".format(**user))
         database_result = self.cursor.fetchall()
         if len(database_result) == 0:
             return jsonify(error="login or password does not match")
-        session["username"] = username
-        session["password"] = password
+        session["username"] = user["username"]
         return jsonify(result="signin successful")
 
     def logout_user(self):
